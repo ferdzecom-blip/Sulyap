@@ -2,11 +2,13 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase, CATS } from '../../lib/supabase'
+import { useAuthModal } from '../../context/AuthModalContext'
 export default function Upload() {
-  const r = useRouter(); const [title, setTitle] = useState(''); const [category, setCat] = useState(CATS[0]); const [file, setFile] = useState(null); const [msg, setMsg] = useState(''); const [busy, setBusy] = useState(false)
+  const r = useRouter(); const { openAuthModal } = useAuthModal()
+  const [title, setTitle] = useState(''); const [category, setCat] = useState(CATS[0]); const [file, setFile] = useState(null); const [msg, setMsg] = useState(''); const [busy, setBusy] = useState(false)
   async function go(e) {
     e.preventDefault(); setMsg('')
-    const { data: { user } } = await supabase.auth.getUser(); if (!user) return r.push('/login')
+    const { data: { user } } = await supabase.auth.getUser(); if (!user) return openAuthModal()
     if (!file) return setMsg('Choose a photo.'); if (file.size > 5 * 1024 * 1024) return setMsg('Photo must be under 5 MB.')
     setBusy(true)
     try {
