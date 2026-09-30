@@ -5,14 +5,17 @@ import { useParams, useRouter } from 'next/navigation'
 import { supabase, pub, SELECT } from '../../../lib/supabase'
 export default function Photo() {
   const { id } = useParams(); const r = useRouter(); const once = useRef(false)
-  const [p, setP] = useState(null); const [me, setMe] = useState(null); const [liked, setLiked] = useState(false)
+  const [p, setP] = useState(null); const [me, setMe] = useState(null); const [liked, setLiked] = useState(false); const [err, setErr] = useState('')
   useEffect(() => { (async () => {
-    const { data } = await supabase.from('photos').select(SELECT).eq('id', id).single(); if (!data) return
+    const { data, error } = await supabase.from('photos').select(SELECT).eq('id', id).single()
+    if (error) { console.error('photo fetch error:', error); return setErr(error.message) }
+    if (!data) return
     if (!once.current) { once.current = true; supabase.rpc('increment_views', { pid: id }); data.views += 1 }
     setP(data)
     const { data: { user } } = await supabase.auth.getUser(); setMe(user)
     if (user) { const { data: l } = await supabase.from('likes').select('user_id').eq('photo_id', id).eq('user_id', user.id); setLiked(!!l?.length) }
   })() }, [id])
+  if (err) return <div className="pn" style={{ borderColor: '#E5484D' }}><b style={{ color: '#ff8a7a' }}>Could not load this photo:</b> {err}</div>
   if (!p) return <p className="mu">Loading…</p>
   const n = p.likes?.[0]?.count ?? 0
   async function like() {
@@ -29,5 +32,10 @@ export default function Photo() {
   return (<div className="det"><img src={pub(p.path)} alt={p.title} /><div><h1 style={{ fontSize: 32 }}>{p.title}</h1>
     <p><Link href={`/u/${p.profiles.username}`}><b>{p.profiles.full_name}</b></Link> · <span className="mu">{p.category}</span></p>
     <div className="row"><div className="st"><b>{p.views}</b>Views</div><div className="st"><b>{n}</b>Likes</div><div className="st"><b>{p.downloads}</b>Downloads</div></div>
-    <div className="row" style={{ marginTop: 16 }}><button className={`b ${liked ? 'p' : ''}`} onClick={like}>♥ {liked ? 'Liked' : 'Like'}</button><button className="b" onClick={download}>⬇ Download</button></div></div></div>)
+    <div className="row" style={{ marginTop: 16 }}><button className={`b ${liked ? 'p' : ''}`} onClick={like}>♥ {liked ? 'Liked' : 'Like'}</button><button className="b" onClick={download}>⬇ Download</button></div>
+    {(p.profiles.paypal || p.profiles.kofi) && <div className="row" style={{ marginTop: 10 }}>
+      {p.profiles.paypal && <a className="b" style={{ background: '#0070BA', borderColor: '#0070BA', color: '#fff' }} href={`https://www.paypal.com/paypalme/${encodeURIComponent(p.profiles.paypal)}`} target="_blank" rel="noopener noreferrer">Donate via PayPal</a>}
+      {p.profiles.kofi && <a className="b" style={{ background: '#FF5E5B', borderColor: '#FF5E5B', color: '#fff' }} href={`https://ko-fi.com/${encodeURIComponent(p.profiles.kofi)}`} target="_blank" rel="noopener noreferrer">☕ Support on Ko-fi</a>}
+    </div>}
+  </div></div>)
 }
