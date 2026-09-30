@@ -3,8 +3,9 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase, pub, SELECT } from '../../../lib/supabase'
+import { useAuthModal } from '../../../context/AuthModalContext'
 export default function Photo() {
-  const { id } = useParams(); const r = useRouter(); const once = useRef(false)
+  const { id } = useParams(); const r = useRouter(); const once = useRef(false); const { openAuthModal } = useAuthModal()
   const [p, setP] = useState(null); const [me, setMe] = useState(null); const [liked, setLiked] = useState(false); const [err, setErr] = useState('')
   useEffect(() => { (async () => {
     const { data, error } = await supabase.from('photos').select(SELECT).eq('id', id).single()
@@ -19,7 +20,7 @@ export default function Photo() {
   if (!p) return <p className="mu">Loading…</p>
   const n = p.likes?.[0]?.count ?? 0
   async function like() {
-    if (!me) return r.push('/login')
+    if (!me) return openAuthModal()
     const q = liked ? supabase.from('likes').delete().eq('photo_id', id).eq('user_id', me.id) : supabase.from('likes').insert({ photo_id: id, user_id: me.id })
     const { error } = await q; if (error) return
     setLiked(!liked); setP({ ...p, likes: [{ count: n + (liked ? -1 : 1) }] })
