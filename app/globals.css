@@ -25,3 +25,51 @@ h2{font-size:22px;text-transform:uppercase;border-left:3px solid var(--am);paddi
 .modal-box{position:relative;background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:22px;width:100%;max-width:400px;max-height:90vh;overflow-y:auto}
 .modal-close{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--mu);font-size:16px;cursor:pointer;padding:4px}.modal-close:hover{color:var(--tx)}
 @media(max-width:800px){.det{grid-template-columns:1fr}.bc h1{font-size:38px}}
+
+/* ===== animations ===== */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{from{opacity:1}to{opacity:0}}
+@keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.96) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes popOut{from{opacity:1;transform:scale(1) translateY(0)}to{opacity:0;transform:scale(.96) translateY(6px)}}
+@keyframes heartPop{0%{transform:scale(1)}35%{transform:scale(1.25)}60%{transform:scale(.95)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+
+/* page-level enter animation, replayed on every route change via PageTransition's key prop */
+.page-enter{animation:riseIn .32s cubic-bezier(.2,.8,.2,1) both}
+
+/* buttons: smooth hover/press feedback */
+.b,.ch,.linkbtn{transition:border-color .15s ease,background-color .15s ease,color .15s ease,transform .12s ease,box-shadow .15s ease}
+.b:hover{transform:translateY(-1px)}
+.b:active{transform:translateY(0) scale(.97)}
+.ch:hover{transform:translateY(-1px)}
+.linkbtn:hover{opacity:.85}
+
+/* like button pop whenever it becomes active */
+.b.p.like-anim{animation:heartPop .35s ease}
+
+/* banner fades in on load */
+.bn{animation:fadeIn .5s ease both}
+.bn img{transition:transform 8s ease}
+.bn:hover img{transform:scale(1.04)}
+
+/* photo cards: staggered rise-in + hover lift */
+.card{animation:riseIn .35s ease both;transition:transform .2s ease,box-shadow .2s ease}
+.card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.35)}
+.card img{transition:transform .35s ease}
+.card:hover img{transform:scale(1.05)}
+.mas .card:nth-child(1){animation-delay:.02s}.mas .card:nth-child(2){animation-delay:.06s}.mas .card:nth-child(3){animation-delay:.1s}
+.mas .card:nth-child(4){animation-delay:.14s}.mas .card:nth-child(5){animation-delay:.18s}.mas .card:nth-child(6){animation-delay:.22s}
+.mas .card:nth-child(7){animation-delay:.26s}.mas .card:nth-child(8){animation-delay:.3s}
+
+/* stat chips, panels, boxes: gentle rise-in */
+.st,.pn,.box,.det{animation:riseIn .3s ease both}
+
+/* success/error notices inside forms */
+.notice{animation:popIn .2s ease both}
+
+/* modal: fade backdrop + pop-in box, with a matching out-animation on close */
+.modal-backdrop{animation:fadeIn .2s ease both}
+.modal-backdrop.closing{animation:fadeOut .16s ease both}
+.modal-box{animation:popIn .22s cubic-bezier(.2,.8,.25,1) both}
+.modal-backdrop.closing .modal-box{animation:popOut .16s ease both}
