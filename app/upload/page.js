@@ -22,5 +22,5 @@ export default function Upload() {
     <div className="f"><label>Title</label><input value={title} onChange={e => setTitle(e.target.value)} required /></div>
     <div className="f"><label>Category</label><select value={category} onChange={e => setCat(e.target.value)}>{CATS.map(c => <option key={c}>{c}</option>)}</select></div>
     <div className="f"><label>Photo (max 5 MB)</label><input type="file" accept="image/*" onChange={e => setFile(e.target.files[0])} /></div>
-    {msg && <p style={{ color: '#ff8a7a' }}>{msg}</p>}<button className="b p" style={{ width: '100%' }} disabled={busy}>{busy ? 'Uploading…' : 'Post'}</button></form>)
+    {msg && <p className="notice" style={{ color: '#ff8a7a' }}>{msg}</p>}<button className="b p" style={{ width: '100%' }} disabled={busy}>{busy ? 'Uploading…' : 'Post'}</button></form>)
 }
