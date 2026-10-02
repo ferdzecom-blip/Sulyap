@@ -17,7 +17,13 @@ export default function AuthModal({ onClose, onSuccess }) {
   const router = useRouter()
   const [mode, setMode] = useState('login')
   const [v, setV] = useState({}); const [msg, setMsg] = useState(''); const [ok, setOk] = useState(''); const [busy, setBusy] = useState(false)
+  const [closing, setClosing] = useState(false)
   const set = k => e => setV({ ...v, [k]: e.target.value })
+
+  // Play the exit animation (see .closing in globals.css) before actually
+  // unmounting, instead of disappearing instantly.
+  function requestClose() { setClosing(true); setTimeout(onClose, 170) }
+  function requestSuccess() { setClosing(true); setTimeout(onSuccess, 170) }
 
   async function resolveEmail(identifier) {
     const id = (identifier || '').trim()
@@ -37,7 +43,7 @@ export default function AuthModal({ onClose, onSuccess }) {
         const { data, error } = await supabase.auth.signUp({ email: v.email, password: v.password, options: { data: { username: v.username.toLowerCase(), full_name: v.name } } })
         if (error) return setMsg(error.message)
         if (!data.session) { setOk('Check your email to confirm your account, then log in.'); return }
-        router.refresh(); onSuccess(); return
+        router.refresh(); requestSuccess(); return
       }
       if (mode === 'forgot') {
         const email = await resolveEmail(v.identifier)
@@ -50,13 +56,13 @@ export default function AuthModal({ onClose, onSuccess }) {
       if (!email) return setMsg('Incorrect username/email or password.')
       const { error } = await supabase.auth.signInWithPassword({ email, password: v.password })
       if (error) return setMsg('Incorrect username/email or password.')
-      router.refresh(); onSuccess()
+      router.refresh(); requestSuccess()
     } finally { setBusy(false) }
   }
 
-  return (<div className="modal-backdrop" onClick={onClose}>
+  return (<div className={`modal-backdrop ${closing ? 'closing' : ''}`} onClick={requestClose}>
     <div className="modal-box" onClick={e => e.stopPropagation()}>
-      <button type="button" className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+      <button type="button" className="modal-close" onClick={requestClose} aria-label="Close">✕</button>
       <form onSubmit={go}>
         <div className="row">
           <button type="button" className={`b ${mode === 'login' ? 'p' : ''}`} style={{ flex: 1 }} onClick={() => { setMode('login'); setMsg(''); setOk('') }}>Log in</button>
@@ -81,8 +87,8 @@ export default function AuthModal({ onClose, onSuccess }) {
           <div className="f"><label>Username or email</label><input onChange={set('identifier')} required /></div>
         </>}
 
-        {msg && <p style={{ color: '#ff8a7a' }}>{msg}</p>}
-        {ok && <p style={{ color: '#4C8C7D' }}>{ok}</p>}
+        {msg && <p className="notice" style={{ color: '#ff8a7a' }}>{msg}</p>}
+        {ok && <p className="notice" style={{ color: '#4C8C7D' }}>{ok}</p>}
 
         <button className="b p" style={{ width: '100%' }} disabled={busy}>
           {busy ? 'Please wait…' : mode === 'reg' ? 'Create account' : mode === 'forgot' ? 'Send reset link' : 'Log in'}
