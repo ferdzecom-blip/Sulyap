@@ -6,7 +6,7 @@ import { supabase, pub, SELECT } from '../../../lib/supabase'
 import { useAuthModal } from '../../../context/AuthModalContext'
 export default function Photo() {
   const { id } = useParams(); const r = useRouter(); const once = useRef(false); const { openAuthModal } = useAuthModal()
-  const [p, setP] = useState(null); const [me, setMe] = useState(null); const [liked, setLiked] = useState(false); const [err, setErr] = useState('')
+  const [p, setP] = useState(null); const [me, setMe] = useState(null); const [liked, setLiked] = useState(false); const [err, setErr] = useState(''); const [pulse, setPulse] = useState(false)
   useEffect(() => { (async () => {
     const { data, error } = await supabase.from('photos').select(SELECT).eq('id', id).single()
     if (error) { console.error('photo fetch error:', error); return setErr(error.message) }
@@ -24,6 +24,7 @@ export default function Photo() {
     const q = liked ? supabase.from('likes').delete().eq('photo_id', id).eq('user_id', me.id) : supabase.from('likes').insert({ photo_id: id, user_id: me.id })
     const { error } = await q; if (error) return
     setLiked(!liked); setP({ ...p, likes: [{ count: n + (liked ? -1 : 1) }] })
+    if (!liked) { setPulse(true); setTimeout(() => setPulse(false), 360) }
   }
   async function download() {
     supabase.rpc('increment_downloads', { pid: id }); setP({ ...p, downloads: p.downloads + 1 })
@@ -33,7 +34,7 @@ export default function Photo() {
   return (<div className="det"><img src={pub(p.path)} alt={p.title} /><div><h1 style={{ fontSize: 32 }}>{p.title}</h1>
     <p><Link href={`/u/${p.profiles.username}`}><b>{p.profiles.full_name}</b></Link> · <span className="mu">{p.category}</span></p>
     <div className="row"><div className="st"><b>{p.views}</b>Views</div><div className="st"><b>{n}</b>Likes</div><div className="st"><b>{p.downloads}</b>Downloads</div></div>
-    <div className="row" style={{ marginTop: 16 }}><button className={`b ${liked ? 'p' : ''}`} onClick={like}>♥ {liked ? 'Liked' : 'Like'}</button><button className="b" onClick={download}>⬇ Download</button></div>
+    <div className="row" style={{ marginTop: 16 }}><button className={`b ${liked ? 'p' : ''} ${pulse ? 'like-anim' : ''}`} onClick={like}>♥ {liked ? 'Liked' : 'Like'}</button><button className="b" onClick={download}>⬇ Download</button></div>
     {(p.profiles.paypal || p.profiles.kofi) && <div className="row" style={{ marginTop: 10 }}>
       {p.profiles.paypal && <a className="b" style={{ background: '#0070BA', borderColor: '#0070BA', color: '#fff' }} href={`https://www.paypal.com/paypalme/${encodeURIComponent(p.profiles.paypal)}`} target="_blank" rel="noopener noreferrer">Donate via PayPal</a>}
       {p.profiles.kofi && <a className="b" style={{ background: '#FF5E5B', borderColor: '#FF5E5B', color: '#fff' }} href={`https://ko-fi.com/${encodeURIComponent(p.profiles.kofi)}`} target="_blank" rel="noopener noreferrer">☕ Support on Ko-fi</a>}
