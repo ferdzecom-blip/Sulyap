@@ -79,8 +79,8 @@ export default function Login() {
       <div className="f"><label>Username or email</label><input onChange={set('identifier')} required /></div>
     </>}
 
-    {msg && <p style={{ color: '#ff8a7a' }}>{msg}</p>}
-    {ok && <p style={{ color: '#4C8C7D' }}>{ok}</p>}
+    {msg && <p className="notice" style={{ color: '#ff8a7a' }}>{msg}</p>}
+    {ok && <p className="notice" style={{ color: '#4C8C7D' }}>{ok}</p>}
 
     <button className="b p" style={{ width: '100%' }} disabled={busy}>
       {busy ? 'Please wait…' : mode === 'reg' ? 'Create account' : mode === 'forgot' ? 'Send reset link' : 'Log in'}
