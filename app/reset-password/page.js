@@ -32,7 +32,7 @@ export default function ResetPassword() {
     <h2 style={{ margin: '0 0 14px' }}>Set a new password</h2>
     <div className="f"><label>New password (6+ characters)</label><PasswordField id="np1" value={p1} onChange={e => setP1(e.target.value)} minLength={6} /></div>
     <div className="f"><label>Confirm new password</label><PasswordField id="np2" value={p2} onChange={e => setP2(e.target.value)} minLength={6} /></div>
-    {msg && <p style={{ color: '#ff8a7a' }}>{msg}</p>}
+    {msg && <p className="notice" style={{ color: '#ff8a7a' }}>{msg}</p>}
     <button className="b p" style={{ width: '100%' }} disabled={busy}>{busy ? 'Saving…' : 'Save new password'}</button>
   </form>)
 }
