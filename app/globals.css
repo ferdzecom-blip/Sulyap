@@ -1,4 +1,4 @@
-:root{--bg:#0F0E0C;--sf:#1B1916;--ln:#3A362E;--tx:#F2EFE9;--mu:#9C968A;--am:#FF5A36}
+:root{--bg:#0F0E0C;--sf:#1B1916;--s2:#232019;--ln:#3A362E;--tx:#F2EFE9;--mu:#9C968A;--am:#FF5A36;color-scheme:dark}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 system-ui,sans-serif}
 a{color:inherit;text-decoration:none}h1,h2{font-family:Impact,'Arial Narrow',sans-serif;font-weight:400;margin:0}
 main{max-width:1120px;margin:auto;padding:24px 20px 80px}.mu{color:var(--mu)}
@@ -73,3 +73,32 @@ h2{font-size:22px;text-transform:uppercase;border-left:3px solid var(--am);paddi
 .modal-backdrop.closing{animation:fadeOut .16s ease both}
 .modal-box{animation:popIn .22s cubic-bezier(.2,.8,.25,1) both}
 .modal-backdrop.closing .modal-box{animation:popOut .16s ease both}
+
+/* ===== notifications ===== */
+.notif-wrap{position:relative}
+.notif-bell{position:relative;font-size:16px;padding:8px 11px}
+.notif-bell.has-unread{animation:bellRing 2.4s ease infinite}
+@keyframes bellRing{0%,88%,100%{transform:rotate(0)}90%{transform:rotate(-12deg)}92%{transform:rotate(10deg)}94%{transform:rotate(-8deg)}96%{transform:rotate(6deg)}98%{transform:rotate(0)}}
+.notif-badge{position:absolute;top:-5px;right:-5px;background:#E5484D;color:#fff;border-radius:99px;font-size:10px;font-weight:700;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;padding:0 4px;animation:popIn .25s ease both}
+.notif-panel{position:absolute;top:calc(100% + 10px);right:0;width:320px;max-width:85vw;max-height:70vh;overflow-y:auto;background:var(--sf);border:1px solid var(--ln);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.45);z-index:30;animation:popIn .18s cubic-bezier(.2,.8,.25,1) both}
+.notif-head{padding:12px 14px;font-weight:700;border-bottom:1px solid var(--ln);position:sticky;top:0;background:var(--sf)}
+.notif-item{display:flex;flex-direction:column;gap:3px;padding:11px 14px;border-bottom:1px solid var(--ln);font-size:13px;color:var(--tx);transition:background-color .15s}
+.notif-item:last-child{border-bottom:none}
+.notif-item:hover{background:var(--s2,rgba(255,255,255,.04))}
+.notif-item.unread{background:rgba(255,90,54,.08);border-left:3px solid var(--am)}
+.notif-time{color:var(--mu);font-size:11px}
+
+
+/* ===== light / dark theme ===== */
+/* Dark is the default (see :root). The toggle in the header sets data-theme on <html>. */
+html[data-theme="light"]{--bg:#F6F3EC;--sf:#FFFFFF;--s2:#EFEBE1;--ln:#DCD5C6;--tx:#1E1B15;--mu:#756E5F;--am:#E05531;color-scheme:light}
+html[data-theme="light"] .card:hover{box-shadow:0 10px 24px rgba(60,40,10,.18)}
+html[data-theme="light"] .notif-panel,html[data-theme="light"] .modal-box{box-shadow:0 12px 32px rgba(60,40,10,.18)}
+html[data-theme="light"] .modal-backdrop{background:rgba(30,25,15,.45)}
+
+/* smooth cross-fade when switching themes */
+body,header,.box,.pn,.st,.card,.modal-box,.notif-panel,.f input,.f select{transition:background-color .25s ease,color .25s ease,border-color .25s ease}
+
+.theme-toggle{font-size:16px;padding:8px 11px;line-height:1}
+.theme-toggle .ti{display:inline-block;transition:transform .35s cubic-bezier(.2,.8,.25,1)}
+.theme-toggle:hover .ti{transform:rotate(20deg) scale(1.1)}
